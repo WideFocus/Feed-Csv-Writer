@@ -31,7 +31,7 @@ $writerFactory = new CsvWriterFactory(
     new LeagueCsvWriterFactory(),
     $mountManager
 );
-````
+```
 
 Then create a writer based on a layout and fields:
 
