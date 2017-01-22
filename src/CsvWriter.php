@@ -81,9 +81,9 @@ class CsvWriter extends AbstractWriter
      */
     protected function initialize()
     {
-        if ($this->isIncludeHeader()) {
-            $this->getBackend()->insertOne(
-                $this->getLabelExtractor()->extract(
+        if ($this->includeHeader) {
+            $this->backend->insertOne(
+                $this->labelExtractor->extract(
                     $this->getFields()
                 )
             );
@@ -99,8 +99,8 @@ class CsvWriter extends AbstractWriter
      */
     protected function writeItem(ArrayAccess $item)
     {
-        $this->getBackend()->insertOne(
-            $this->getValueExtractor()->extract(
+        $this->backend->insertOne(
+            $this->valueExtractor->extract(
                 $this->getFields(),
                 $item
             )
@@ -114,69 +114,9 @@ class CsvWriter extends AbstractWriter
      */
     protected function finish()
     {
-        $this->getFilesystem()->put(
-            $this->getPath(),
-            (string)$this->getBackend()
+        $this->filesystem->put(
+            $this->path,
+            (string)$this->backend
         );
-    }
-
-    /**
-     * Get the backend.
-     *
-     * @return Writer
-     */
-    protected function getBackend(): Writer
-    {
-        return $this->backend;
-    }
-
-    /**
-     * Get the filesystem.
-     *
-     * @return FilesystemInterface
-     */
-    protected function getFilesystem(): FilesystemInterface
-    {
-        return $this->filesystem;
-    }
-
-    /**
-     * Get the label extractor.
-     *
-     * @return LabelExtractorInterface
-     */
-    protected function getLabelExtractor(): LabelExtractorInterface
-    {
-        return $this->labelExtractor;
-    }
-
-    /**
-     * Get the value extractor.
-     *
-     * @return ValueExtractorInterface
-     */
-    protected function getValueExtractor(): ValueExtractorInterface
-    {
-        return $this->valueExtractor;
-    }
-
-    /**
-     * Get the path.
-     *
-     * @return string
-     */
-    protected function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Whether to include the header.
-     *
-     * @return bool
-     */
-    protected function isIncludeHeader(): bool
-    {
-        return $this->includeHeader;
     }
 }
