@@ -6,8 +6,15 @@
 
 namespace WideFocus\Feed\CsvWriter\Tests;
 
+use ArrayAccess;
+use League\Csv\Writer;
+use League\Flysystem\FilesystemInterface;
 use PHPUnit_Framework_TestCase;
+use ReflectionMethod;
 use WideFocus\Feed\CsvWriter\CsvWriter;
+use WideFocus\Feed\Writer\Field\LabelExtractorInterface;
+use WideFocus\Feed\Writer\Field\ValueExtractorInterface;
+use WideFocus\Feed\Writer\Field\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
 
 /**
@@ -15,9 +22,6 @@ use WideFocus\Feed\Writer\WriterInterface;
  */
 class CsvWriterTest extends PHPUnit_Framework_TestCase
 {
-    use CommonMocksTrait;
-    use ProtectedMethodTrait;
-
     /**
      * @return WriterInterface
      *
@@ -26,10 +30,10 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
     public function testConstructor(): WriterInterface
     {
         return new CsvWriter(
-            $this->createLeagueCsvWriterMock(),
-            $this->createFilesystemMock(),
-            $this->createLabelExtractorMock(),
-            $this->createValueExtractorMock(),
+            $this->createMock(Writer::class),
+            $this->createMock(FilesystemInterface::class),
+            $this->createMock(LabelExtractorInterface::class),
+            $this->createMock(ValueExtractorInterface::class),
             'test.csv',
             true
         );
@@ -43,19 +47,16 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
      * @dataProvider includeHeadersDataProvider
      *
      * @covers ::initialize
-     * @covers ::getBackend
-     * @covers ::getLabelExtractor
-     * @covers ::isIncludeHeader
      */
     public function testInitialize(bool $includeHeaders)
     {
-        $backend        = $this->createLeagueCsvWriterMock();
-        $labelExtractor = $this->createLabelExtractorMock();
+        $backend        = $this->createMock(Writer::class);
+        $labelExtractor = $this->createMock(LabelExtractorInterface::class);
 
         $labels = ['Foo', 'Bar'];
         $fields = [
-            $this->createWriterFieldMock(),
-            $this->createWriterFieldMock()
+            $this->createMock(WriterFieldInterface::class),
+            $this->createMock(WriterFieldInterface::class)
         ];
 
 
@@ -72,9 +73,9 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
 
         $writer = new CsvWriter(
             $backend,
-            $this->createFilesystemMock(),
+            $this->createMock(FilesystemInterface::class),
             $labelExtractor,
-            $this->createValueExtractorMock(),
+            $this->createMock(ValueExtractorInterface::class),
             'test.csv',
             true
         );
@@ -90,18 +91,17 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
      * @dataProvider includeHeadersDataProvider
      *
      * @covers ::writeItem
-     * @covers ::getValueExtractor
      */
     public function testWriteItem()
     {
-        $backend        = $this->createLeagueCsvWriterMock();
-        $valueExtractor = $this->createValueExtractorMock();
+        $backend        = $this->createMock(Writer::class);
+        $valueExtractor = $this->createMock(ValueExtractorInterface::class);
 
         $values = ['foo', 'bar'];
-        $item   = $this->createFeedItemMock();
+        $item   = $this->createMock(ArrayAccess::class);
         $fields = [
-            $this->createWriterFieldMock(),
-            $this->createWriterFieldMock()
+            $this->createMock(WriterFieldInterface::class),
+            $this->createMock(WriterFieldInterface::class)
         ];
 
         $valueExtractor->expects($this->once())
@@ -115,8 +115,8 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
 
         $writer = new CsvWriter(
             $backend,
-            $this->createFilesystemMock(),
-            $this->createLabelExtractorMock(),
+            $this->createMock(FilesystemInterface::class),
+            $this->createMock(LabelExtractorInterface::class),
             $valueExtractor,
             'test.csv',
             true
@@ -131,13 +131,11 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
      * @return void
      *
      * @covers ::finish
-     * @covers ::getFilesystem
-     * @covers ::getPath
      */
     public function testFinish()
     {
-        $backend    = $this->createLeagueCsvWriterMock();
-        $filesystem = $this->createFilesystemMock();
+        $backend    = $this->createMock(Writer::class);
+        $filesystem = $this->createMock(FilesystemInterface::class);
 
         $backend->expects($this->once())
             ->method('__toString')
@@ -150,8 +148,8 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
         $writer = new CsvWriter(
             $backend,
             $filesystem,
-            $this->createLabelExtractorMock(),
-            $this->createValueExtractorMock(),
+            $this->createMock(LabelExtractorInterface::class),
+            $this->createMock(ValueExtractorInterface::class),
             'test.csv',
             true
         );
@@ -169,5 +167,20 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
             [true],
             [false]
         ];
+    }
+
+    /**
+     * Get an accessible reflection of a protected method.
+     *
+     * @param string $class
+     * @param string $method
+     *
+     * @return ReflectionMethod
+     */
+    protected function getProtectedMethod(string $class, string $method): ReflectionMethod
+    {
+        $reflection = new ReflectionMethod($class, $method);
+        $reflection->setAccessible(true);
+        return $reflection;
     }
 }

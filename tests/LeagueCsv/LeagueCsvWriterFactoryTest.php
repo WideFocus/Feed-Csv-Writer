@@ -9,15 +9,12 @@ namespace WideFocus\Feed\CsvWriter\Tests\LeagueCsv;
 use League\Csv\Writer;
 use WideFocus\Feed\CsvWriter\CsvWriterLayoutInterface;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory;
-use WideFocus\Feed\CsvWriter\Tests\CommonMocksTrait;
 
 /**
  * @coversDefaultClass \WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory
  */
 class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonMocksTrait;
-
     /**
      * @param CsvWriterLayoutInterface $layout
      * @param array                    $writerValues
@@ -59,7 +56,7 @@ class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
             'getBom'       => Writer::BOM_UTF32_BE
         ];
 
-        $layout = $this->createCsvWriterLayoutMock();
+        $layout = $this->createMock(CsvWriterLayoutInterface::class);
         foreach ($layoutValues as $getter => $value) {
             $layout->expects($this->once())
                 ->method($getter)
