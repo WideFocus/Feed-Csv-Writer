@@ -10,9 +10,9 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactoryInterface;
 use WideFocus\Feed\Writer\WriterFactoryInterface;
-use WideFocus\Feed\Writer\WriterField\LabelExtractor;
-use WideFocus\Feed\Writer\WriterField\ValueExtractor;
-use WideFocus\Feed\Writer\WriterField\WriterFieldInterface;
+use WideFocus\Feed\Writer\Field\LabelExtractor;
+use WideFocus\Feed\Writer\Field\ValueExtractor;
+use WideFocus\Feed\Writer\Field\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
 use WideFocus\Feed\Writer\WriterLayoutInterface;
 

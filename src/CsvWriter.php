@@ -10,8 +10,8 @@ use ArrayAccess;
 use League\Csv\Writer;
 use League\Flysystem\FilesystemInterface;
 use WideFocus\Feed\Writer\AbstractWriter;
-use WideFocus\Feed\Writer\WriterField\LabelExtractorInterface;
-use WideFocus\Feed\Writer\WriterField\ValueExtractorInterface;
+use WideFocus\Feed\Writer\Field\LabelExtractorInterface;
+use WideFocus\Feed\Writer\Field\ValueExtractorInterface;
 
 /**
  * Writes CSV feeds.
