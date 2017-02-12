@@ -15,6 +15,10 @@
         {
             "type": "vcs",
             "url": "https://bitbucket.org/widefocus/feed-writer"
+        },
+        {
+            "type": "vcs",
+            "url": "https://bitbucket.org/widefocus/parameters"
         }
     ],
     "require": {

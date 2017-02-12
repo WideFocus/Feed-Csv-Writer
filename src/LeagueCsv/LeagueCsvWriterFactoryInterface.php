@@ -6,18 +6,17 @@
 
 namespace WideFocus\Feed\CsvWriter\LeagueCsv;
 
-
 use League\Csv\Writer;
-use WideFocus\Feed\CsvWriter\CsvWriterLayoutInterface;
+use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 
 interface LeagueCsvWriterFactoryInterface
 {
     /**
-     * Create a CSV writer based a writer layout.
+     * Create a CSV writer based a writer parameters.
      *
-     * @param CsvWriterLayoutInterface $writerLayout
+     * @param CsvWriterParametersInterface $parameters
      *
      * @return Writer
      */
-    public function createWriter(CsvWriterLayoutInterface $writerLayout): Writer;
+    public function createWriter(CsvWriterParametersInterface $parameters): Writer;
 }

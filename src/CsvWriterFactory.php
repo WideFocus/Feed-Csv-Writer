@@ -14,7 +14,7 @@ use WideFocus\Feed\Writer\Field\LabelExtractor;
 use WideFocus\Feed\Writer\Field\ValueExtractor;
 use WideFocus\Feed\Writer\Field\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
-use WideFocus\Feed\Writer\WriterLayoutInterface;
+use WideFocus\Feed\Writer\WriterParametersInterface;
 
 class CsvWriterFactory implements WriterFactoryInterface
 {
@@ -45,20 +45,20 @@ class CsvWriterFactory implements WriterFactoryInterface
     /**
      * Create a writer.
      *
-     * @param WriterFieldInterface[] $fields
-     * @param WriterLayoutInterface  $layout
+     * @param WriterFieldInterface[]    $fields
+     * @param WriterParametersInterface $parameters
      *
      * @return WriterInterface
      */
     public function createWriter(
         array $fields,
-        WriterLayoutInterface $layout
+        WriterParametersInterface $parameters
     ): WriterInterface {
-        /** @var CsvWriterLayoutInterface $layout */
-        $backend        = $this->backendFactory->createWriter($layout);
-        $filesystem     = $this->getFilesystem($layout->getDestination());
-        $path           = $this->getDestinationPath($layout->getDestination());
-        $includeHeader  = $layout->isIncludeHeader();
+        /** @var CsvWriterParametersInterface $parameters */
+        $backend        = $this->backendFactory->createWriter($parameters);
+        $filesystem     = $this->getFilesystem($parameters->getDestination());
+        $path           = $this->getDestinationPath($parameters->getDestination());
+        $includeHeader  = $parameters->isIncludeHeader();
         $labelExtractor = new LabelExtractor();
         $valueExtractor = new ValueExtractor();
 
@@ -84,7 +84,9 @@ class CsvWriterFactory implements WriterFactoryInterface
      */
     protected function getFilesystem(string $destination): FilesystemInterface
     {
-        list($prefix) = $this->mountManager->filterPrefix([$destination]);
+        list($prefix) = $this->mountManager
+            ->filterPrefix([$destination]);
+
         return $this->mountManager->getFilesystem($prefix);
     }
 
@@ -97,7 +99,9 @@ class CsvWriterFactory implements WriterFactoryInterface
      */
     protected function getDestinationPath(string $destination): string
     {
-        list(, $arguments) = $this->mountManager->filterPrefix([$destination]);
+        list(, $arguments) = $this->mountManager
+            ->filterPrefix([$destination]);
+
         return array_shift($arguments);
     }
 }
