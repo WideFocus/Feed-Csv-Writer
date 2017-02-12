@@ -33,24 +33,25 @@ $writerFactory = new CsvWriterFactory(
 );
 ```
 
-Then create a writer based on a layout and fields:
+Then create a writer based on parameters and fields:
 
 ```php
 <?php
 
-use WideFocus\Feed\CsvWriter\CsvWriterLayout;
-use WideFocus\Feed\Writer\WriterField\WriterField;
+use WideFocus\Feed\CsvWriter\CsvWriterParameters;
+use WideFocus\Feed\Writer\Field\WriterField;
 
-$layout = new CsvWriterLayout();
-$layout->setDestination('local://my-feed.csv')
-    ->setIncludeHeader(true);
+$parameters = new CsvWriterParameters([
+    'destination' => 'local://my-feed.csv',
+    'include_header' => true
+]);
 
 $fields = [
     new WriterField('foo', 'Foo'),
     new WriterField('bar', 'Bar', 'strtoupper')
 ];
 
-$writer = $writerFactory->createWriter($fields, $layout);
+$writer = $writerFactory->createWriter($fields, $parameters);
 ```
 
 Then write the feed:
