@@ -46,12 +46,11 @@ $parameters = new CsvWriterParameters([
     'include_header' => true
 ]);
 
-$fields = [
+$writer = $writerFactory->createWriter($parameters);
+$writer->setFields([
     new WriterField('foo', 'Foo'),
     new WriterField('bar', 'Bar', 'strtoupper')
-];
-
-$writer = $writerFactory->createWriter($fields, $parameters);
+]);
 ```
 
 Then write the feed:
