@@ -12,7 +12,6 @@ use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactoryInterface;
 use WideFocus\Feed\Writer\WriterFactoryInterface;
 use WideFocus\Feed\Writer\Field\LabelExtractor;
 use WideFocus\Feed\Writer\Field\ValueExtractor;
-use WideFocus\Feed\Writer\Field\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
 use WideFocus\Feed\Writer\WriterParametersInterface;
 
@@ -45,13 +44,11 @@ class CsvWriterFactory implements WriterFactoryInterface
     /**
      * Create a writer.
      *
-     * @param WriterFieldInterface[]    $fields
      * @param WriterParametersInterface $parameters
      *
      * @return WriterInterface
      */
     public function createWriter(
-        array $fields,
         WriterParametersInterface $parameters
     ): WriterInterface {
         /** @var CsvWriterParametersInterface $parameters */
@@ -71,7 +68,6 @@ class CsvWriterFactory implements WriterFactoryInterface
             $includeHeader
         );
 
-        $writer->setFields($fields);
         return $writer;
     }
 
