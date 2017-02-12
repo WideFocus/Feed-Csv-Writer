@@ -7,7 +7,7 @@
 namespace WideFocus\Feed\CsvWriter\Tests\LeagueCsv;
 
 use League\Csv\Writer;
-use WideFocus\Feed\CsvWriter\CsvWriterLayoutInterface;
+use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory;
 
 /**
@@ -16,8 +16,8 @@ use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory;
 class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @param CsvWriterLayoutInterface $layout
-     * @param array                    $writerValues
+     * @param CsvWriterParametersInterface $parameters
+     * @param array                        $writerValues
      *
      * @return Writer
      *
@@ -25,10 +25,10 @@ class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::createWriter
      */
-    public function testCreateWriter(CsvWriterLayoutInterface $layout, array $writerValues): Writer
+    public function testCreateWriter(CsvWriterParametersInterface $parameters, array $writerValues): Writer
     {
         $factory = new LeagueCsvWriterFactory();
-        $writer  = $factory->createWriter($layout);
+        $writer  = $factory->createWriter($parameters);
         foreach ($writerValues as $getter => $value) {
             $this->assertEquals($writer->$getter(), $value);
         }
@@ -56,7 +56,7 @@ class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
             'getBom'       => Writer::BOM_UTF32_BE
         ];
 
-        $layout = $this->createMock(CsvWriterLayoutInterface::class);
+        $layout = $this->createMock(CsvWriterParametersInterface::class);
         foreach ($layoutValues as $getter => $value) {
             $layout->expects($this->once())
                 ->method($getter)

@@ -12,12 +12,11 @@ use League\Flysystem\MountManager;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use WideFocus\Feed\CsvWriter\CsvWriterFactory;
-use WideFocus\Feed\CsvWriter\CsvWriterLayoutInterface;
+use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactoryInterface;
 use WideFocus\Feed\Writer\WriterFactoryInterface;
 use WideFocus\Feed\Writer\Field\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
-use WideFocus\Feed\Writer\WriterLayoutInterface;
 
 /**
  * @coversDefaultClass \WideFocus\Feed\CsvWriter\CsvWriterFactory
@@ -38,8 +37,8 @@ class CsvWriterFactoryTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param WriterFieldInterface[]                                        $fields
-     * @param WriterLayoutInterface|PHPUnit_Framework_MockObject_MockObject $layout
+     * @param WriterFieldInterface[]                                               $fields
+     * @param CsvWriterParametersInterface|PHPUnit_Framework_MockObject_MockObject $layout
      *
      * @return WriterInterface
      *
@@ -49,7 +48,7 @@ class CsvWriterFactoryTest extends PHPUnit_Framework_TestCase
      * @covers ::getFilesystem
      * @covers ::getDestinationPath
      */
-    public function testCreateWriter(array $fields, WriterLayoutInterface $layout): WriterInterface
+    public function testCreateWriter(array $fields, CsvWriterParametersInterface $layout): WriterInterface
     {
         $backendFactory = $this->createMock(LeagueCsvWriterFactoryInterface::class);
         $mountManager   = $this->createMock(MountManager::class);
@@ -88,7 +87,7 @@ class CsvWriterFactoryTest extends PHPUnit_Framework_TestCase
                     $this->createMock(WriterFieldInterface::class),
                     $this->createMock(WriterFieldInterface::class)
                 ],
-                $this->createMock(CsvWriterLayoutInterface::class)
+                $this->createMock(CsvWriterParametersInterface::class)
             ]
         ];
     }
