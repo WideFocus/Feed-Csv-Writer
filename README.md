@@ -1,5 +1,9 @@
 # WideFocus Feed Csv Writer
 
+[![Build Status](https://travis-ci.org/WideFocus/Feed-Csv-Writer.svg?branch=master)](https://travis-ci.org/WideFocus/Feed-Csv-Writer)
+[![Latest Stable Version](https://poser.pugx.org/widefocus/feed-csv-writer/v/stable)](https://packagist.org/packages/widefocus/feed-csv-writer)
+[![License](https://poser.pugx.org/widefocus/feed-csv-writer/license)](https://packagist.org/packages/widefocus/feed-csv-writer)
+
 This package contains models to write a CSV feed.
 
 ## Installation
