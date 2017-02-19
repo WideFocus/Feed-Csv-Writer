@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright WideFocus. All rights reserved.
- * http://www.widefocus.net
+ * Copyright WideFocus. See LICENSE.txt.
+ * https://www.widefocus.net
  */
 
 namespace WideFocus\Feed\CsvWriter;

@@ -2,28 +2,18 @@
     "name": "widefocus/feed-csv-writer",
     "description": "This package contains the implementation to write a CSV feed.",
     "type": "library",
-    "license": "proprietary",
+    "license": "MIT",
     "prefer-stable": true,
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Ashoka de Wit",
-            "email": "contact@widefocus.net"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://bitbucket.org/widefocus/feed-writer"
-        },
-        {
-            "type": "vcs",
-            "url": "https://bitbucket.org/widefocus/parameters"
+            "email": "ashoka@widefocus.net"
         }
     ],
     "require": {
         "php": "^7.0",
-        "widefocus/feed-writer": "dev-master",
+        "widefocus/feed-writer": "^1.0",
         "league/csv": "^8.1",
         "league/flysystem": "^1.0"
     },
