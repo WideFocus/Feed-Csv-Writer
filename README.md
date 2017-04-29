@@ -42,19 +42,19 @@ Then create a writer based on parameters and fields:
 ```php
 <?php
 
-use WideFocus\Feed\CsvWriter\CsvWriterParameters;
-use WideFocus\Feed\Writer\Field\WriterField;
+use WideFocus\Parameters\ParameterBag;
+use WideFocus\Feed\Writer\WriterField;
 
-$parameters = new CsvWriterParameters([
+$parameters = new ParameterBag([
     'destination' => 'local://my-feed.csv',
     'include_header' => true
 ]);
 
-$writer = $writerFactory->createWriter($parameters);
-$writer->setFields([
+$writer = $writerFactory->create(
+    $parameters,
     new WriterField('foo', 'Foo'),
     new WriterField('bar', 'Bar', 'strtoupper')
-]);
+);
 ```
 
 Then write the feed:
