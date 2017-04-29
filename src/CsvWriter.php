@@ -9,15 +9,21 @@ namespace WideFocus\Feed\CsvWriter;
 use ArrayAccess;
 use League\Csv\Writer;
 use League\Flysystem\FilesystemInterface;
-use WideFocus\Feed\Writer\AbstractWriter;
-use WideFocus\Feed\Writer\Field\LabelExtractorInterface;
-use WideFocus\Feed\Writer\Field\ValueExtractorInterface;
+use WideFocus\Feed\Writer\ExtractFieldLabelsTrait;
+use WideFocus\Feed\Writer\ExtractFieldValuesTrait;
+use WideFocus\Feed\Writer\WriterFieldInterface;
+use WideFocus\Feed\Writer\WriterInterface;
+use WideFocus\Feed\Writer\WriterTrait;
 
 /**
  * Writes CSV feeds.
  */
-class CsvWriter extends AbstractWriter
+class CsvWriter implements WriterInterface
 {
+    use ExtractFieldLabelsTrait;
+    use ExtractFieldValuesTrait;
+    use WriterTrait;
+
     /**
      * @var Writer
      */
@@ -27,16 +33,6 @@ class CsvWriter extends AbstractWriter
      * @var FilesystemInterface
      */
     private $filesystem;
-
-    /**
-     * @var LabelExtractorInterface
-     */
-    private $labelExtractor;
-
-    /**
-     * @var ValueExtractorInterface
-     */
-    private $valueExtractor;
 
     /**
      * @var string
@@ -49,29 +45,31 @@ class CsvWriter extends AbstractWriter
     private $includeHeader;
 
     /**
+     * @var WriterFieldInterface[]
+     */
+    private $fields;
+
+    /**
      * Constructor.
      *
-     * @param Writer                  $backend
-     * @param FilesystemInterface     $filesystem
-     * @param LabelExtractorInterface $labelExtractor
-     * @param ValueExtractorInterface $valueExtractor
-     * @param string                  $path
-     * @param bool                    $includeHeader
+     * @param Writer                 $backend
+     * @param FilesystemInterface    $filesystem
+     * @param string                 $path
+     * @param bool                   $includeHeader
+     * @param WriterFieldInterface[] ...$fields
      */
     public function __construct(
         Writer $backend,
         FilesystemInterface $filesystem,
-        LabelExtractorInterface $labelExtractor,
-        ValueExtractorInterface $valueExtractor,
         string $path,
-        bool $includeHeader
+        bool $includeHeader,
+        WriterFieldInterface ...$fields
     ) {
-        $this->backend        = $backend;
-        $this->filesystem     = $filesystem;
-        $this->labelExtractor = $labelExtractor;
-        $this->valueExtractor = $valueExtractor;
-        $this->path           = $path;
-        $this->includeHeader  = $includeHeader;
+        $this->backend       = $backend;
+        $this->filesystem    = $filesystem;
+        $this->path          = $path;
+        $this->includeHeader = $includeHeader;
+        $this->fields        = $fields;
     }
 
     /**
@@ -83,9 +81,7 @@ class CsvWriter extends AbstractWriter
     {
         if ($this->includeHeader) {
             $this->backend->insertOne(
-                $this->labelExtractor->extract(
-                    $this->getFields()
-                )
+                $this->extractFieldLabels(...$this->fields)
             );
         }
     }
@@ -100,10 +96,7 @@ class CsvWriter extends AbstractWriter
     protected function writeItem(ArrayAccess $item)
     {
         $this->backend->insertOne(
-            $this->valueExtractor->extract(
-                $this->getFields(),
-                $item
-            )
+            $this->extractFieldValues($item, ...$this->fields)
         );
     }
 

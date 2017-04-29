@@ -9,11 +9,10 @@ namespace WideFocus\Feed\CsvWriter;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactoryInterface;
-use WideFocus\Feed\Writer\WriterFactoryInterface;
-use WideFocus\Feed\Writer\Field\LabelExtractor;
-use WideFocus\Feed\Writer\Field\ValueExtractor;
+use WideFocus\Feed\Writer\Builder\WriterFactoryInterface;
+use WideFocus\Feed\Writer\WriterFieldInterface;
 use WideFocus\Feed\Writer\WriterInterface;
-use WideFocus\Feed\Writer\WriterParametersInterface;
+use WideFocus\Parameters\ParameterBagInterface;
 
 class CsvWriterFactory implements WriterFactoryInterface
 {
@@ -44,31 +43,23 @@ class CsvWriterFactory implements WriterFactoryInterface
     /**
      * Create a writer.
      *
-     * @param WriterParametersInterface $parameters
+     * @param ParameterBagInterface  $parameters
+     * @param WriterFieldInterface[] ...$fields
      *
      * @return WriterInterface
      */
-    public function createWriter(
-        WriterParametersInterface $parameters
+    public function create(
+        ParameterBagInterface $parameters,
+        WriterFieldInterface ...$fields
     ): WriterInterface {
-        /** @var CsvWriterParametersInterface $parameters */
-        $backend        = $this->backendFactory->createWriter($parameters);
-        $filesystem     = $this->getFilesystem($parameters->getDestination());
-        $path           = $this->getDestinationPath($parameters->getDestination());
-        $includeHeader  = $parameters->isIncludeHeader();
-        $labelExtractor = new LabelExtractor();
-        $valueExtractor = new ValueExtractor();
-
-        $writer = new CsvWriter(
-            $backend,
-            $filesystem,
-            $labelExtractor,
-            $valueExtractor,
-            $path,
-            $includeHeader
+        $destination = $parameters->get('destination', 'tmp://feed.csv');
+        return new CsvWriter(
+            $this->backendFactory->create($parameters),
+            $this->getFilesystem($destination),
+            $this->getDestinationPath($destination),
+            $parameters->get('include_header', true),
+            ...$fields
         );
-
-        return $writer;
     }
 
     /**

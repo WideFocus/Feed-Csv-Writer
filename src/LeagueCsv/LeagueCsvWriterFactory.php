@@ -9,26 +9,27 @@ namespace WideFocus\Feed\CsvWriter\LeagueCsv;
 use League\Csv\Writer;
 use SplTempFileObject;
 use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
+use WideFocus\Parameters\ParameterBagInterface;
 
 class LeagueCsvWriterFactory implements LeagueCsvWriterFactoryInterface
 {
     /**
      * Create a CSV writer based a writer parameters.
      *
-     * @param CsvWriterParametersInterface $parameters
+     * @param ParameterBagInterface $parameters
      *
      * @return Writer
      */
-    public function createWriter(CsvWriterParametersInterface $parameters): Writer
+    public function create(ParameterBagInterface $parameters): Writer
     {
         $writer = Writer::createFromFileObject(new SplTempFileObject());
 
         $writer
-            ->setDelimiter($parameters->getDelimiter())
-            ->setEnclosure($parameters->getEnclosure())
-            ->setNewline($parameters->getNewline())
-            ->setEscape($parameters->getEscape())
-            ->setOutputBOM($parameters->getBom());
+            ->setDelimiter($parameters->get('delimiter', ','))
+            ->setEnclosure($parameters->get('enclosure', '"'))
+            ->setNewline($parameters->get('newline', "\n"))
+            ->setEscape($parameters->get('escape', '\\'))
+            ->setOutputBOM($parameters->get('bom', ''));
 
         return $writer;
     }

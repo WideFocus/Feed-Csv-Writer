@@ -7,16 +7,16 @@
 namespace WideFocus\Feed\CsvWriter\LeagueCsv;
 
 use League\Csv\Writer;
-use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
+use WideFocus\Parameters\ParameterBagInterface;
 
 interface LeagueCsvWriterFactoryInterface
 {
     /**
      * Create a CSV writer based a writer parameters.
      *
-     * @param CsvWriterParametersInterface $parameters
+     * @param ParameterBagInterface $parameters
      *
      * @return Writer
      */
-    public function createWriter(CsvWriterParametersInterface $parameters): Writer;
+    public function create(ParameterBagInterface $parameters): Writer;
 }
