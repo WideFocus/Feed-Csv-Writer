@@ -1,71 +1,78 @@
 <?php
 /**
- * Copyright WideFocus. See LICENSE.txt.
- * https://www.widefocus.net
+ * Copyright WideFocus. All rights reserved.
+ * http://www.widefocus.net
  */
 
 namespace WideFocus\Feed\CsvWriter\Tests;
 
+
 use League\Csv\Writer;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
+use WideFocus\Feed\CsvWriter\CsvWriter;
 use WideFocus\Feed\CsvWriter\CsvWriterFactory;
-use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactoryInterface;
-use WideFocus\Feed\Writer\WriterFactoryInterface;
-use WideFocus\Feed\Writer\WriterInterface;
+use WideFocus\Parameters\ParameterBagInterface;
 
 /**
  * @coversDefaultClass \WideFocus\Feed\CsvWriter\CsvWriterFactory
  */
-class CsvWriterFactoryTest extends PHPUnit_Framework_TestCase
+class CsvWriterFactoryTest extends TestCase
 {
     /**
-     * @return WriterFactoryInterface
+     * @return void
      *
      * @covers ::__construct
      */
-    public function testConstructor(): WriterFactoryInterface
+    public function testConstructor()
     {
-        $backendFactory = $this->createMock(LeagueCsvWriterFactoryInterface::class);
-        $mountManager   = $this->createMock(MountManager::class);
-        
-        return new CsvWriterFactory($backendFactory, $mountManager);
+        $this->assertInstanceOf(
+            CsvWriterFactory::class,
+            new CsvWriterFactory(
+                $this->createMock(LeagueCsvWriterFactoryInterface::class),
+                $this->createMock(MountManager::class)
+            )
+        );
     }
 
     /**
-     * @return WriterInterface
+     * @return void
      *
-     * @covers ::createWriter
+     * @covers ::create
      * @covers ::getFilesystem
      * @covers ::getDestinationPath
      */
-    public function testCreateWriter(): WriterInterface
+    public function testCreate()
     {
-        $parameters = $this->createMock(CsvWriterParametersInterface::class);
-        $parameters->expects($this->any())
-            ->method('getDestination')
-            ->willReturn('local://test.csv');
+        $parameters = $this->createMock(ParameterBagInterface::class);
+        $parameters
+            ->expects($this->any())
+            ->method('get')
+            ->willReturnArgument(1);
 
-        $mountManager   = $this->createMock(MountManager::class);
+        $mountManager = $this->createMock(MountManager::class);
         $mountManager->expects($this->any())
             ->method('filterPrefix')
-            ->with(['local://test.csv'])
-            ->willReturn(['local', ['test.csv']]);
+            ->with(['tmp://feed.csv'])
+            ->willReturn(['tmp', ['feed.csv']]);
 
         $mountManager->expects($this->once())
             ->method('getFilesystem')
-            ->with('local')
+            ->with('tmp')
             ->willReturn($this->createMock(FilesystemInterface::class));
 
         $backendFactory = $this->createMock(LeagueCsvWriterFactoryInterface::class);
         $backendFactory->expects($this->once())
-            ->method('createWriter')
+            ->method('create')
             ->with($parameters)
             ->willReturn($this->createMock(Writer::class));
 
         $factory = new CsvWriterFactory($backendFactory, $mountManager);
-        return $factory->createWriter($parameters);
+        $this->assertInstanceOf(
+            CsvWriter::class,
+            $factory->create($parameters)
+        );
     }
 }

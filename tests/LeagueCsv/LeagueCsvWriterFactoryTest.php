@@ -1,73 +1,43 @@
 <?php
 /**
- * Copyright WideFocus. See LICENSE.txt.
- * https://www.widefocus.net
+ * Copyright WideFocus. All rights reserved.
+ * http://www.widefocus.net
  */
 
 namespace WideFocus\Feed\CsvWriter\Tests\LeagueCsv;
 
+
 use League\Csv\Writer;
-use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory;
+use WideFocus\Parameters\ParameterBagInterface;
 
 /**
  * @coversDefaultClass \WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory
  */
-class LeagueCsvWriterFactoryTest extends \PHPUnit_Framework_TestCase
+class LeagueCsvWriterFactoryTest extends \PHPUnit\Framework\TestCase
 {
+
     /**
-     * @param CsvWriterParametersInterface $parameters
-     * @param array                        $writerValues
+     * @return void
      *
-     * @return Writer
-     *
-     * @dataProvider dataProvider
-     *
-     * @covers ::createWriter
+     * @covers ::create
      */
-    public function testCreateWriter(CsvWriterParametersInterface $parameters, array $writerValues): Writer
+    public function testCreate()
     {
+        $parameters = $this->createMock(ParameterBagInterface::class);
+        $parameters
+            ->expects($this->any())
+            ->method('get')
+            ->willReturnArgument(1);
+
         $factory = new LeagueCsvWriterFactory();
-        $writer  = $factory->createWriter($parameters);
-        foreach ($writerValues as $getter => $value) {
-            $this->assertEquals($writer->$getter(), $value);
-        }
-        return $writer;
-    }
+        $writer  = $factory->create($parameters);
 
-    /**
-     * @return array
-     */
-    public function dataProvider(): array
-    {
-        $writerValues = [
-            'getDelimiter' => "\t",
-            'getEnclosure' => '|',
-            'getEscape'    => '=',
-            'getNewline'   => "\r\n",
-            'getOutputBOM' => Writer::BOM_UTF32_BE
-        ];
-
-        $layoutValues = [
-            'getDelimiter' => "\t",
-            'getEnclosure' => '|',
-            'getEscape'    => '=',
-            'getNewline'   => "\r\n",
-            'getBom'       => Writer::BOM_UTF32_BE
-        ];
-
-        $layout = $this->createMock(CsvWriterParametersInterface::class);
-        foreach ($layoutValues as $getter => $value) {
-            $layout->expects($this->once())
-                ->method($getter)
-                ->willReturn($value);
-        }
-
-        return [
-            [
-                $layout,
-                $writerValues
-            ]
-        ];
+        $this->assertInstanceOf(Writer::class, $writer);
+        $this->assertEquals(',', $writer->getDelimiter());
+        $this->assertEquals('"', $writer->getEnclosure());
+        $this->assertEquals("\n", $writer->getNewline());
+        $this->assertEquals('\\', $writer->getEscape());
+        $this->assertEquals('', $writer->getOutputBOM());
     }
 }

@@ -1,41 +1,40 @@
 <?php
 /**
- * Copyright WideFocus. See LICENSE.txt.
- * https://www.widefocus.net
+ * Copyright WideFocus. All rights reserved.
+ * http://www.widefocus.net
  */
 
 namespace WideFocus\Feed\CsvWriter\Tests;
 
+
 use ArrayAccess;
 use League\Csv\Writer;
 use League\Flysystem\FilesystemInterface;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use WideFocus\Feed\CsvWriter\CsvWriter;
-use WideFocus\Feed\Writer\Field\LabelExtractorInterface;
-use WideFocus\Feed\Writer\Field\ValueExtractorInterface;
-use WideFocus\Feed\Writer\Field\WriterFieldInterface;
-use WideFocus\Feed\Writer\WriterInterface;
+use WideFocus\Feed\Writer\WriterFieldInterface;
 
 /**
  * @coversDefaultClass \WideFocus\Feed\CsvWriter\CsvWriter
  */
-class CsvWriterTest extends PHPUnit_Framework_TestCase
+class CsvWriterTest extends TestCase
 {
     /**
-     * @return WriterInterface
+     * @return void
      *
      * @covers ::__construct
      */
-    public function testConstructor(): WriterInterface
+    public function testConstructor()
     {
-        return new CsvWriter(
-            $this->createMock(Writer::class),
-            $this->createMock(FilesystemInterface::class),
-            $this->createMock(LabelExtractorInterface::class),
-            $this->createMock(ValueExtractorInterface::class),
-            'test.csv',
-            true
+        $this->assertInstanceOf(
+            CsvWriter::class,
+            new CsvWriter(
+                $this->createMock(Writer::class),
+                $this->createMock(FilesystemInterface::class),
+                'test.csv',
+                true
+            )
         );
     }
 
@@ -50,111 +49,37 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
      */
     public function testInitialize(bool $includeHeaders)
     {
-        $backend        = $this->createMock(Writer::class);
-        $labelExtractor = $this->createMock(LabelExtractorInterface::class);
-
-        $labels = ['Foo', 'Bar'];
         $fields = [
-            $this->createMock(WriterFieldInterface::class),
-            $this->createMock(WriterFieldInterface::class)
+            $this->createConfiguredMock(
+                WriterFieldInterface::class,
+                ['getLabel' => 'Foo']
+            ),
+            $this->createConfiguredMock(
+                WriterFieldInterface::class,
+                ['getLabel' => 'Bar']
+            )
         ];
 
-
+        $backend = $this->createMock(Writer::class);
         if ($includeHeaders) {
-            $labelExtractor->expects($this->once())
-                ->method('extract')
-                ->with($fields)
-                ->willReturn($labels);
-
             $backend->expects($this->once())
                 ->method('insertOne')
-                ->with($labels);
+                ->with(['Foo', 'Bar']);
+        } else {
+            $backend->expects($this->never())
+                ->method('insertOne');
         }
 
         $writer = new CsvWriter(
             $backend,
             $this->createMock(FilesystemInterface::class),
-            $labelExtractor,
-            $this->createMock(ValueExtractorInterface::class),
             'test.csv',
-            true
-        );
-        $writer->setFields($fields);
-
-        $method = $this->getProtectedMethod(CsvWriter::class, 'initialize');
-        $method->invoke($writer);
-    }
-
-    /**
-     * @return void
-     *
-     * @dataProvider includeHeadersDataProvider
-     *
-     * @covers ::writeItem
-     */
-    public function testWriteItem()
-    {
-        $backend        = $this->createMock(Writer::class);
-        $valueExtractor = $this->createMock(ValueExtractorInterface::class);
-
-        $values = ['foo', 'bar'];
-        $item   = $this->createMock(ArrayAccess::class);
-        $fields = [
-            $this->createMock(WriterFieldInterface::class),
-            $this->createMock(WriterFieldInterface::class)
-        ];
-
-        $valueExtractor->expects($this->once())
-            ->method('extract')
-            ->with($fields, $item)
-            ->willReturn($values);
-
-        $backend->expects($this->once())
-            ->method('insertOne')
-            ->with($values);
-
-        $writer = new CsvWriter(
-            $backend,
-            $this->createMock(FilesystemInterface::class),
-            $this->createMock(LabelExtractorInterface::class),
-            $valueExtractor,
-            'test.csv',
-            true
-        );
-        $writer->setFields($fields);
-
-        $method = $this->getProtectedMethod(CsvWriter::class, 'writeItem');
-        $method->invoke($writer, $item);
-    }
-
-    /**
-     * @return void
-     *
-     * @covers ::finish
-     */
-    public function testFinish()
-    {
-        $backend    = $this->createMock(Writer::class);
-        $filesystem = $this->createMock(FilesystemInterface::class);
-
-        $backend->expects($this->once())
-            ->method('__toString')
-            ->willReturn('{file contents}');
-
-        $filesystem->expects($this->once())
-            ->method('put')
-            ->with('test.csv', '{file contents}');
-
-        $writer = new CsvWriter(
-            $backend,
-            $filesystem,
-            $this->createMock(LabelExtractorInterface::class),
-            $this->createMock(ValueExtractorInterface::class),
-            'test.csv',
-            true
+            $includeHeaders,
+            ...$fields
         );
 
-        $method = $this->getProtectedMethod(CsvWriter::class, 'finish');
+        $method = new ReflectionMethod(CsvWriter::class, 'initialize');
+        $method->setAccessible(true);
         $method->invoke($writer);
     }
 
@@ -170,17 +95,69 @@ class CsvWriterTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Get an accessible reflection of a protected method.
+     * @return void
      *
-     * @param string $class
-     * @param string $method
+     * @dataProvider includeHeadersDataProvider
      *
-     * @return ReflectionMethod
+     * @covers ::writeItem
      */
-    protected function getProtectedMethod(string $class, string $method): ReflectionMethod
+    public function testWriteItem()
     {
-        $reflection = new ReflectionMethod($class, $method);
-        $reflection->setAccessible(true);
-        return $reflection;
+        $fields = [
+            $this->createConfiguredMock(
+                WriterFieldInterface::class,
+                ['getValue' => 'FooValue']
+            ),
+            $this->createConfiguredMock(
+                WriterFieldInterface::class,
+                ['getValue' => 'BarValue']
+            )
+        ];
+
+        $backend = $this->createMock(Writer::class);
+        $backend->expects($this->once())
+            ->method('insertOne')
+            ->with(['FooValue', 'BarValue']);
+
+        $writer = new CsvWriter(
+            $backend,
+            $this->createMock(FilesystemInterface::class),
+            'test.csv',
+            true,
+            ...$fields
+        );
+
+        $method = new ReflectionMethod(CsvWriter::class, 'writeItem');
+        $method->setAccessible(true);
+        $method->invoke($writer, $this->createMock(ArrayAccess::class));
+    }
+
+    /**
+     * @return void
+     *
+     * @covers ::finish
+     */
+    public function testFinish()
+    {
+        $backend = $this->createMock(Writer::class);
+        $backend->expects($this->once())
+            ->method('__toString')
+            ->willReturn('{file contents}');
+
+        $filesystem = $this->createMock(FilesystemInterface::class);
+        $filesystem->expects($this->once())
+            ->method('put')
+            ->with('test.csv', '{file contents}');
+
+        $writer = new CsvWriter(
+            $backend,
+            $filesystem,
+            'test.csv',
+            true
+        );
+
+        $method = new ReflectionMethod(CsvWriter::class, 'finish');
+        $method->setAccessible(true);
+        $method->invoke($writer);
     }
 }
