@@ -6,7 +6,6 @@
 
 namespace WideFocus\Feed\CsvWriter\Tests;
 
-
 use ArrayAccess;
 use League\Csv\Writer;
 use League\Flysystem\FilesystemInterface;

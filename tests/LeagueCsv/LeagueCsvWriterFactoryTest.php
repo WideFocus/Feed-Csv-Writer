@@ -6,7 +6,6 @@
 
 namespace WideFocus\Feed\CsvWriter\Tests\LeagueCsv;
 
-
 use League\Csv\Writer;
 use WideFocus\Feed\CsvWriter\LeagueCsv\LeagueCsvWriterFactory;
 use WideFocus\Parameters\ParameterBagInterface;

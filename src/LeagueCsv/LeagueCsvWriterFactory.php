@@ -8,7 +8,6 @@ namespace WideFocus\Feed\CsvWriter\LeagueCsv;
 
 use League\Csv\Writer;
 use SplTempFileObject;
-use WideFocus\Feed\CsvWriter\CsvWriterParametersInterface;
 use WideFocus\Parameters\ParameterBagInterface;
 
 class LeagueCsvWriterFactory implements LeagueCsvWriterFactoryInterface
